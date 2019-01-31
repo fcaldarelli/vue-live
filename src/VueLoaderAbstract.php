@@ -4,22 +4,18 @@ namespace fabriziocaldarelli\vuelive;
 
 abstract class VueLoaderAbstract
 {
+    // VueType costants
     public const VUETYPE_APP = 'app';
     public const VUETYPE_COMPONENT = 'component';
 
+    // Template costants
+    public const TEMPLATE_INLINE = 'inline';
+    public const TEMPLATE_SCRIPT = 'script';
+
+    // Private members
     private $_dirName = null;
     private $_stackDependencies = [];
     private $_allContentsAsArray = null;
-
-    /**
-     * @var bool Whether that all data is prepared, after created the object
-     */
-    private $_isPrepared = false;
-
-    /**
-     * @var string File name for vue contents
-     */
-    protected $fileName = 'vue';
 
     /**
      * @return string the name of tag
@@ -35,6 +31,24 @@ abstract class VueLoaderAbstract
      * @return array Array of config array with __class key to identify the class or string identify class path
      */
     protected abstract function dependencies() : array;
+
+    /**
+     * @var bool Whether that all data is prepared, after created the object
+     */
+    private $_isPrepared = false;
+
+    /**
+     * Property that can be changed
+     * @var string File name for vue contents
+     */
+    protected $fileName = 'vue';
+
+    /**
+     * Property that can be changed
+     * @var string File name for vue contents
+     */
+    protected $template = self::TEMPLATE_INLINE;
+
 
     public function __construct()
     {
@@ -140,7 +154,10 @@ abstract class VueLoaderAbstract
                     }
                     else if($vueType == 'component')
                     {
-                        $out[] = sprintf('<script type="text/x-template" id="%s">%s</script>', $componentName.'-content-template', $content);
+                        if($dep['model']->template == self::TEMPLATE_SCRIPT)
+                        {
+                            $out[] = sprintf('<script type="text/x-template" id="%s">%s</script>', $componentName.'-content-template', $content);
+                        }
                     }                    
                     else
                     {
@@ -156,7 +173,15 @@ abstract class VueLoaderAbstract
                     }
                     else if($vueType == 'component')
                     {
-                        $jsContent = str_replace(['___TEMPLATE___', '___COMPONENT_NAME___'], [ sprintf('#%s-content-template', $componentName), $componentName ], $content);
+                        if($dep['model']->template == self::TEMPLATE_INLINE)
+                        {
+                            $htmlContent = file_get_contents($dep['htmlFiles'][0]['pathFile']);
+                            $jsContent = str_replace(['\'___TEMPLATE___\'', '___COMPONENT_NAME___'], [ '`'.$htmlContent.'`', $componentName ], $content);
+                        }
+                        else
+                        {
+                            $jsContent = str_replace(['___TEMPLATE___', '___COMPONENT_NAME___'], [ sprintf('#%s-content-template', $componentName), $componentName ], $content);
+                        }
                         $out[] = sprintf('<script>%s</script>', $jsContent);
                     }
                 }
