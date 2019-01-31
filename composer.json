@@ -1,0 +1,19 @@
+{
+    "name": "fabriziocaldarelli/vue-live",
+    "description": "Runtime loading of vue components from PHP",
+    "type": "library",
+    "license": "BSD 3-Clause",
+    "authors": [
+        {
+            "name": "Fabrizio Caldarelli",
+            "email": "fabrizio.caldarelli@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "fabriziocaldarelli\\vuelive\\" : "src/",
+            "fabriziocaldarelli\\vuelive\\demo\\" : "demo/" 
+        }
+    }    
+}
